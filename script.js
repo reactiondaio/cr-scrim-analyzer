@@ -1,4 +1,31 @@
+import { initializeApp } from "https://www.gstatic.com/firebasejs/13.4.0/firebase-app.js";
+import {
+  getAuth,
+  GoogleAuthProvider,
+  signInWithPopup,
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/13.4.0/firebase-auth.js";
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  setDoc,
+  onSnapshot
+} from "https://www.gstatic.com/firebasejs/13.4.0/firebase-firestore.js";
 
+const firebaseConfig = {
+  apiKey: "AIzaSyDIL_8BSKAThvnnJmnzdKGJPLnf9lLyto",
+  authDomain: "scrim-analyzer-96e97.firebaseapp.com",
+  projectId: "scrim-analyzer-96e97",
+  storageBucket: "scrim-analyzer-96e97.firebasestorage.app",
+  messagingSenderId: "752400130734",
+  appId: "1:752400130734:web:2ce0e513d68ab5b930c33f"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const googleProvider = new GoogleAuthProvider();
 const opponentInput = document.getElementById("opponent");
 const modeInput = document.getElementById("mode");
 const mapInput = document.getElementById("map");
@@ -40,7 +67,61 @@ const modes = [
 
 const brawlers = [];
 const brawlerImages = {};
+const brawlerData = [];
 
+let selectedBrawlers = [];
+
+const rarityOrder = [
+  "Common",
+  "Starting Brawler",
+  "Rare",
+  "Super Rare",
+  "Epic",
+  "Mythic",
+  "Legendary",
+  "Ultra Legendary"
+];
+
+const rarityNames = {
+  "Starting Brawler": "初期キャラ",
+  "Rare": "レア",
+  "Super Rare": "スーパーレア",
+  "Epic": "ハイパーレア",
+  "Mythic": "ミシック",
+  "Legendary": "レジェンド",
+  "Ultra Legendary": "ウルトラレジェンド"
+};
+
+// 選択状態を更新
+function updateBrawlerPickerSelection() {
+  const picker = document.getElementById("brawlerPicker");
+  const selectedText = document.getElementById("selectedPicksText");
+  const undoButton = document.getElementById("undoPick");
+  const completeButton = document.getElementById("completePicks");
+
+  ["pick1", "pick2", "pick3"].forEach((id, index) => {
+    document.getElementById(id).value =
+      selectedBrawlers[index] || "";
+  });
+
+  selectedText.textContent = selectedBrawlers.length
+    ? selectedBrawlers.map((name, index) =>
+        `${index + 1}. ${name}`
+      ).join("　")
+    : "まだキャラが選択されていません";
+
+  undoButton.disabled = selectedBrawlers.length === 0;
+  completeButton.hidden = selectedBrawlers.length !== 3;
+
+  picker.querySelectorAll(".brawler-option").forEach(button => {
+    button.classList.toggle(
+      "selected",
+      selectedBrawlers.includes(button.dataset.brawler)
+    );
+  });
+}
+
+// キャラ一覧を読み込む
 async function loadBrawlers() {
   const response = await fetch(
     "https://api.brawlapi.com/v1/brawlers"
@@ -54,14 +135,31 @@ async function loadBrawlers() {
 
   const allBrawlers = data.list
     .filter(brawler => brawler.released)
-    .sort((a, b) => a.name.localeCompare(b.name));
+    .sort((a, b) => {
+      const rarityA = typeof a.rarity === "string"
+        ? a.rarity
+        : a.rarity?.name || "";
+
+      const rarityB = typeof b.rarity === "string"
+        ? b.rarity
+        : b.rarity?.name || "";
+
+      const rankA = rarityOrder.indexOf(rarityA);
+      const rankB = rarityOrder.indexOf(rarityB);
+
+      return (rankA === -1 ? 99 : rankA) -
+             (rankB === -1 ? 99 : rankB);
+    });
 
   allBrawlers.forEach(brawler => {
     brawlers.push(brawler.name);
     brawlerImages[brawler.name] =
       brawler.imageUrl2 || brawler.imageUrl;
+
+    brawlerData.push(brawler);
   });
 
+  // 既存の保存機能用セレクトも維持
   ["pick1", "pick2", "pick3"].forEach(id => {
     const select = document.getElementById(id);
     select.innerHTML =
@@ -74,6 +172,83 @@ async function loadBrawlers() {
       select.appendChild(option);
     });
   });
+
+  // レア度ごとにキャラを表示
+  const picker = document.getElementById("brawlerPicker");
+  picker.innerHTML = "";
+
+  const rarities = [
+    ...rarityOrder,
+    ...new Set(
+      brawlerData.map(b => typeof b.rarity === "string"
+        ? b.rarity
+        : b.rarity?.name || "Other"
+      )
+    )
+  ];
+
+  [...new Set(rarities)].forEach(rarity => {
+    const group = brawlerData.filter(b => {
+  const name = typeof b.rarity === "string"
+    ? b.rarity
+    : b.rarity?.name || "Other";
+
+  return name === rarity;
+}).reverse();
+
+    if (group.length === 0) return;
+
+    const heading = document.createElement("h4");
+    heading.textContent = rarityNames[rarity] || rarity;
+    picker.appendChild(heading);
+
+    const grid = document.createElement("div");
+    grid.className = "brawler-grid";
+
+    group.forEach(brawler => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "brawler-option";
+      button.dataset.brawler = brawler.name;
+
+      const img = document.createElement("img");
+      img.src = brawlerImages[brawler.name];
+      img.alt = brawler.name;
+
+      const label = document.createElement("span");
+      label.textContent = brawler.name;
+
+      button.append(img, label);
+      grid.appendChild(button);
+    });
+
+    picker.appendChild(grid);
+  });
+
+  // キャラ選択
+  picker.addEventListener("click", event => {
+    const button = event.target.closest(".brawler-option");
+    if (!button) return;
+
+    const name = button.dataset.brawler;
+
+    if (selectedBrawlers.includes(name)) {
+      selectedBrawlers = selectedBrawlers.filter(
+        brawler => brawler !== name
+      );
+    } else {
+      if (selectedBrawlers.length >= 3) {
+        alert("キャラは3体まで選択できます");
+        return;
+      }
+
+      selectedBrawlers.push(name);
+    }
+
+    updateBrawlerPickerSelection();
+  });
+
+  updateBrawlerPickerSelection();
 
   console.log("登録キャラ数:", brawlers.length);
 }
@@ -554,17 +729,11 @@ document.getElementById("pick2").value = "";
 document.getElementById("pick3").value = "";
 
   alert("試合データを保存しました！");
+
+updateMatchHistory();
+showStep(1);
 });
 
-// 起動時に統計を表示
-updateStats();
-updateMatchHistory();
-console.log("保存データ:", localStorage.getItem("crMatches"));
-console.log("読み込み件数:", matches.length);
-updateAnalysisMaps();
-sortBrawlers.addEventListener("change", () => {
-  updateBrawlerStats();
-});
 // マップ選択時にキャラ分析を更新
 analysisMap.addEventListener("change", () => {
   updateBrawlerStats();
@@ -590,10 +759,267 @@ historySearch.addEventListener("input", updateMatchHistory);
 historyResultFilter.addEventListener("change", updateMatchHistory);
 
 historyDateSort.addEventListener("change", updateMatchHistory);
-const debugBox = document.createElement("pre");
-debugBox.textContent =
-  "保存データ:\n" +
-  localStorage.getItem("crMatches") +
-  "\n\n読み込み件数: " + matches.length;
 
-document.body.appendChild(debugBox);
+const mapList = {
+  "Brawl Ball": [
+    "狭き門",
+    "トリプル・ドリブル",
+    "静かな広場",
+    "スーパービーチ",
+    "ピンボールドリーム",
+    "中央コート",
+    "ビーチボール",
+    "サニーサッカー"
+  ],
+  "Gem Grab": [
+    "ごつごつ坑道",
+    "クリスタルアーケード",
+    "サボテンの罠",
+    "エメラルドの要塞",
+    "アンダーマイン",
+    "ダブルレール"
+  ],
+  "Heist": [
+    "どんぱち谷",
+    "安全地帯",
+    "ホットポテト",
+    "橋の彼方",
+    "ピットストップ"
+  ],
+  "Bounty": [
+    "流れ星",
+    "隠れ家",
+    "ミルフィーユ",
+    "乾燥地帯"
+  ],
+  "Hot Zone": [
+    "オープンビジネス",
+    "炎のリング",
+    "ビートルバトル"
+  ],
+  "Knockout": [
+    "ゴールドアームの渓谷",
+    "ベルの岩",
+    "オープンフィールド",
+    "新たなる地平"
+  ]
+};
+
+const modeSelect = document.getElementById("mode");
+const mapSelect = document.getElementById("map");
+
+function updateMapList() {
+  const selectedMode = modeSelect.value;
+  const maps = mapList[selectedMode] || [];
+
+  mapSelect.innerHTML =
+    '<option value="">マップを選択</option>';
+
+  maps.forEach(mapName => {
+    const option = document.createElement("option");
+    option.value = mapName;
+    option.textContent = mapName;
+    mapSelect.appendChild(option);
+  });
+}
+
+modeSelect.addEventListener("change", updateMapList);
+
+updateMapList();
+
+// 5ステップ画面切り替え
+let currentStep = 1;
+
+function showStep(step) {
+  currentStep = step;
+
+  document.querySelectorAll(".form-step").forEach((section, index) => {
+    section.hidden = index + 1 !== step;
+  });
+
+  document.getElementById("stepProgress").textContent =
+    `STEP ${step} / 5`;
+}
+
+// 次へボタン
+document.getElementById("next1").addEventListener("click", () => {
+  if (!opponentInput.value.trim()) {
+    alert("対戦相手を入力してください！");
+    return;
+  }
+  showStep(2);
+});
+
+document.getElementById("next2").addEventListener("click", () => {
+  showStep(3);
+});
+
+document.getElementById("next3").addEventListener("click", () => {
+  if (!mapInput.value) {
+    alert("マップを選択してください！");
+    return;
+  }
+  showStep(4);
+});
+
+document.getElementById("next4").addEventListener("click", () => {
+  showStep(5);
+});
+
+// 戻るボタン
+document.getElementById("back2").addEventListener("click", () => showStep(1));
+document.getElementById("back3").addEventListener("click", () => showStep(2));
+document.getElementById("back4").addEventListener("click", () => showStep(3));
+document.getElementById("back5").addEventListener("click", () => showStep(4));
+
+// 最初の画面を表示
+showStep(1);
+
+// ページ切り替え機能
+const navButtons = document.querySelectorAll(".nav-button");
+const pages = document.querySelectorAll(".page");
+
+navButtons.forEach(button => {
+  button.addEventListener("click", () => {
+    const targetPage = button.dataset.page;
+
+    pages.forEach(page => {
+      page.hidden = page.id !== targetPage;
+      page.classList.toggle("active", page.id === targetPage);
+    });
+
+    navButtons.forEach(nav => {
+      nav.classList.toggle("active", nav === button);
+    });
+
+    window.scrollTo(0, 0);
+  });
+});
+// 保存済み対戦相手
+const savedOpponentsSelect = document.getElementById("savedOpponents");
+const saveOpponentButton = document.getElementById("saveOpponent");
+const deleteOpponentButton = document.getElementById("deleteOpponent");
+
+let savedOpponents = JSON.parse(
+  localStorage.getItem("crSavedOpponents") || "[]"
+);
+
+// 保存済み相手を表示
+function updateSavedOpponents() {
+  savedOpponentsSelect.innerHTML =
+    '<option value="">保存した相手を選択</option>';
+
+  savedOpponents.forEach(opponent => {
+    const option = document.createElement("option");
+    option.value = opponent;
+    option.textContent = opponent;
+    savedOpponentsSelect.appendChild(option);
+  });
+}
+
+// 相手を保存
+saveOpponentButton.addEventListener("click", () => {
+  const name = opponentInput.value.trim();
+
+  if (!name) {
+    alert("対戦相手を入力してください");
+    return;
+  }
+
+  if (savedOpponents.includes(name)) {
+    alert("この相手はすでに保存されています");
+    return;
+  }
+
+  savedOpponents.push(name);
+  localStorage.setItem(
+    "crSavedOpponents",
+    JSON.stringify(savedOpponents)
+  );
+
+  updateSavedOpponents();
+  alert("相手を保存しました！");
+});
+
+// 保存した相手を入力欄に反映
+savedOpponentsSelect.addEventListener("change", () => {
+  if (savedOpponentsSelect.value) {
+    opponentInput.value = savedOpponentsSelect.value;
+  }
+});
+
+// 相手を削除
+deleteOpponentButton.addEventListener("click", () => {
+  const name = savedOpponentsSelect.value;
+
+  if (!name) {
+    alert("削除する相手を選択してください");
+    return;
+  }
+
+  savedOpponents = savedOpponents.filter(
+    opponent => opponent !== name
+  );
+
+  localStorage.setItem(
+    "crSavedOpponents",
+    JSON.stringify(savedOpponents)
+  );
+
+  updateSavedOpponents();
+  alert("相手を削除しました");
+});
+
+// 起動時に読み込み
+updateSavedOpponents();
+// 勝ち・負けボタン
+const resultButtons = document.querySelectorAll(".result-button");
+const resultSelect = document.getElementById("result");
+
+resultButtons.forEach(button => {
+  button.addEventListener("click", () => {
+    resultSelect.value = button.dataset.result;
+
+    resultButtons.forEach(btn => {
+      btn.classList.remove("active");
+    });
+
+    button.classList.add("active");
+  });
+});
+// ピックを1つ戻す
+document.getElementById("undoPick").addEventListener("click", () => {
+  selectedBrawlers.pop();
+  updateBrawlerPickerSelection();
+});
+
+// 3体選択後に完了
+document.getElementById("completePicks").addEventListener("click", () => {
+  document.getElementById("next4").click();
+});
+// Googleログイン機能
+const googleLoginButton = document.getElementById("googleLogin");
+const loginStatus = document.getElementById("loginStatus");
+
+googleLoginButton.addEventListener("click", async () => {
+  try {
+    await signInWithPopup(auth, googleProvider);
+  } catch (error) {
+    console.error("ログインエラー:", error);
+    alert("ログインに失敗しました。もう一度試してください。");
+  }
+});
+
+// ログイン状態を確認
+onAuthStateChanged(auth, user => {
+  if (user) {
+    loginStatus.textContent =
+      "ログイン中：" + user.displayName;
+    googleLoginButton.textContent = "ログイン済み";
+    googleLoginButton.disabled = true;
+  } else {
+    loginStatus.textContent = "ログインしていません";
+    googleLoginButton.textContent = "Googleログイン";
+    googleLoginButton.disabled = false;
+  }
+});
