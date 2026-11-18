@@ -17,7 +17,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/13.4.0/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDIL_8BSKAThvnnJmnzdKGJPLnf9lLyto",
+  apiKey: "AIzaSyDIL_8_1BSKAThvnnJmnzdKGJPLnf9lLyto",
   authDomain: "scrim-analyzer-96e97.firebaseapp.com",
   projectId: "scrim-analyzer-96e97",
   storageBucket: "scrim-analyzer-96e97.firebasestorage.app",
