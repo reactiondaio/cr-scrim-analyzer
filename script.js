@@ -2,7 +2,8 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/13.4.0/firebas
 import {
   getAuth,
   GoogleAuthProvider,
-  signInWithPopup,
+  signInWithRedirect,
+  getRedirectResult,
   onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/13.4.0/firebase-auth.js";
 import {
@@ -1003,7 +1004,7 @@ const loginStatus = document.getElementById("loginStatus");
 
 googleLoginButton.addEventListener("click", async () => {
   try {
-    await signInWithPopup(auth, googleProvider);
+    await signInWithRedirect(auth, googleProvider);
   } catch (error) {
     console.error("ログインエラー:", error);
     alert("ログインに失敗しました。もう一度試してください。");
@@ -1023,3 +1024,14 @@ onAuthStateChanged(auth, user => {
     googleLoginButton.disabled = false;
   }
 });
+
+getRedirectResult(auth)
+  .then(result => {
+    if (result?.user) {
+      console.log("Googleログイン成功！");
+    }
+  })
+  .catch(error => {
+    console.error("ログインエラー:", error);
+    alert("ログインエラー：" + error.message);
+  });
