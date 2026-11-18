@@ -9,212 +9,316 @@
 </head>
 <body>
   <div class="app">
+
     <header>
-      <div class="logo">CR<span>.</span></div>
-      <div class="header-text">SCRIM ANALYZER</div>
-    </header>
+  <div class="logo">CR<span>.</span></div>
+  <div class="header-text">SCRIM ANALYZER</div>
+  <button type="button" id="googleLogin">Googleログイン</button>
+  <p id="loginStatus">ログインしていません</p>
+</header>
 
     <main>
-      <section class="welcome">
-        <p>COMPETITIVE ANALYSIS</p>
-        <h1>TEAM<br>OVERVIEW</h1>
-        <p>CR SCRIM DATA CENTER</p>
-      </section>
 
-      <section class="stats">
-        <div class="stat-card">
-          <p>TOTAL MATCHES</p>
-          <h2 id="totalMatches">0</h2>
-        </div>
-        <div class="stat-card">
-          <p>WIN RATE</p>
-          <h2 id="winRate">--%</h2>
-        </div>
-      </section>
+      <!-- HOME PAGE -->
+      
+      <div class="page active" id="homePage">
+<h1 class="page-title">TEAM OVERVIEW</h1>
+<p class="page-subtitle">チームの戦績とパフォーマンス</p>
+        <section class="welcome">
+          <p>COMPETITIVE ANALYSIS</p>
+          <h1>TEAM<br>OVERVIEW</h1>
+          <p>CR SCRIM DATA CENTER</p>
+        </section>
 
-      <section class="menu">
-        <h2>ANALYSIS MENU</h2>
-        <button>マップ別分析 <span>01</span></button>
-        <button>キャラ使用率・勝率 <span>02</span></button>
-        <button>チーム編成分析 <span>03</span></button>
-        <button>試合データ登録 <span>04</span></button>
-      </section>
-    
-<section class="match-form">
-  <h2>NEW MATCH</h2>
+        <section class="stats">
+          <div class="stat-card">
+            <p>TOTAL MATCHES</p>
+            <h2 id="totalMatches">0</h2>
+          </div>
+          <div class="stat-card">
+            <p>WIN RATE</p>
+            <h2 id="winRate">--%</h2>
+          </div>
+        </section>
+
+        <section class="team-overview">
+          <h2>TEAM OVERVIEW</h2>
+          <div class="overview-grid">
+            <div class="overview-card">
+              <span>総試合数</span>
+              <strong id="overviewTotal">0</strong>
+            </div>
+            <div class="overview-card">
+              <span>勝率</span>
+              <strong id="overviewWinRate">--%</strong>
+            </div>
+            <div class="overview-card">
+              <span>勝利数</span>
+              <strong id="overviewWins">0</strong>
+            </div>
+            <div class="overview-card">
+              <span>敗北数</span>
+              <strong id="overviewLosses">0</strong>
+            </div>
+          </div>
+        </section>
+
+        <section class="recent-performance">
+          <h2>RECENT PERFORMANCE</h2>
+          <div class="recent-stats">
+            <div class="recent-card">
+              <span>LAST 5 WIN RATE</span>
+              <strong id="recentWinRate">--%</strong>
+            </div>
+            <div class="recent-card">
+              <span>CURRENT STREAK</span>
+              <strong id="currentStreak">--</strong>
+            </div>
+          </div>
+          <div class="recent-card">
+            <span>LAST 5 MATCHES</span>
+            <div id="recentResults">データがありません</div>
+          </div>
+        </section>
+
+        <section class="best-performance">
+          <h2>BEST PERFORMANCE</h2>
+          <div class="best-grid">
+            <div class="best-card">
+              <span>BEST WIN STREAK</span>
+              <strong id="bestWinStreak">0</strong>
+            </div>
+            <div class="best-card">
+              <span>WORST LOSE STREAK</span>
+              <strong id="worstLoseStreak">0</strong>
+            </div>
+            <div class="best-card">
+              <span>BEST MODE</span>
+              <strong id="bestMode">--</strong>
+            </div>
+          </div>
+        </section>
+
+        <section class="opponent-analysis">
+          <h2>OPPONENT ANALYSIS</h2>
+          <div id="opponentStats">
+            データがありません
+          </div>
+        </section>
+
+      </div>
+
+
+      <!-- MATCH PAGE -->
+      
+      <div class="page" id="matchPage" hidden>
+<h1 class="page-title">NEW MATCH</h1>
+<p class="page-subtitle">新しい試合データを登録</p>
+        <section class="match-form">
+          <h2>NEW MATCH</h2>
+
+          <p id="stepProgress">STEP 1 / 5</p>
+
+          <div class="form-step" id="step1">
+  <h3>STEP 1：対戦相手</h3>
 
   <label>対戦相手</label>
   <input type="text" id="opponent" placeholder="Opponent name">
 
-  <label>ゲームモード</label>
-  <select id="mode">
-    <option>Brawl Ball</option>
-    <option>Gem Grab</option>
-    <option>Heist</option>
-    <option>Bounty</option>
-    <option>Hot Zone</option>
-    <option>Knockout</option>
+  <button type="button" id="saveOpponent">＋ 相手を保存</button>
+
+  <label>保存済みの相手</label>
+  <select id="savedOpponents">
+    <option value="">保存した相手を選択</option>
   </select>
 
-  <label>マップ</label>
-  <input type="text" id="map" placeholder="Map name">
+  <button type="button" id="deleteOpponent">選択した相手を削除</button>
 
-  <label>試合結果</label>
-  <select id="result">
-    <option value="WIN">WIN</option>
-    <option value="LOSE">LOSE</option>
-  </select>
-<label>CR PICK 1</label>
-<select id="pick1">
-  <option value="">キャラを選択</option>
-</select>
-
-<label>CR PICK 2</label>
-<select id="pick2">
-  <option value="">キャラを選択</option>
-</select>
-
-<label>CR PICK 3</label>
-<select id="pick3">
-  <option value="">キャラを選択</option>
-</select>
-  <button id="saveMatch">SAVE MATCH</button>
-</section>
-
-<section class="match-history">
-  <h2>MATCH HISTORY</h2>
-  <div class="history-filter">
-  <input
-    type="text"
-    id="historySearch"
-    placeholder="対戦相手・マップで検索"
-  >
-
-  
-  <select id="historyResultFilter">
-    <option value="ALL">すべての試合</option>
-    <option value="WIN">WIN</option>
-    <option value="LOSE">LOSE</option>
-  </select>
-
-  <select id="historyDateSort">
-    <option value="newest">新しい順</option>
-    <option value="oldest">古い順</option>
-  </select>
-
+  <button type="button" id="next1">次へ</button>
 </div>
-  <button id="undoDelete" disabled>復元</button>
-  <div id="matchList">
-    <p>まだ試合データがありません。</p>
-  </div>
-</section>
-<section class="stats">
-  <div class="stat-card">
-    <p>TOTAL MATCHES</p>
-    <h2 id="totalMatches">0</h2>
-  </div>
-  <div class="stat-card">
-    <p>WIN RATE</p>
-    <h2 id="winRate">--%</h2>
-  </div>
-</section><section class="mode-analysis">
-  <h2>MODE WIN RATE</h2>
-  <div class="stats" id="modeStats"></div>
-</section><section class="map-analysis">
-  <h2>MAP WIN RATE</h2>
-  <div id="mapStats" class="stats"></div>
-</section><section class="brawler-analysis">
-  <h2>MAP × BRAWLER ANALYSIS</h2>
 
-  <label>分析するマップ</label>
-  <select id="analysisMap">
-    <option value="">マップを選択</option>
+          <div class="form-step" id="step2" hidden>
+            <h3>STEP 2：ゲームモード</h3>
+            <label>ゲームモード</label>
+            <select id="mode">
+              <option value="Brawl Ball">ブロストライカー</option>
+              <option value="Gem Grab">エメラルドハント</option>
+              <option value="Heist">強奪</option>
+              <option value="Bounty">賞金稼ぎ</option>
+              <option value="Hot Zone">ホットゾーン</option>
+              <option value="Knockout">ノックアウト</option>
+            </select>
+            <button type="button" id="back2">戻る</button>
+            <button type="button" id="next2">次へ</button>
+          </div>
+
+          <div class="form-step" id="step3" hidden>
+            <h3>STEP 3：マップ</h3>
+            <label>マップ</label>
+            <select id="map">
+              <option value="">マップを選択</option>
+            </select>
+            <button type="button" id="back3">戻る</button>
+            <button type="button" id="next3">次へ</button>
+          </div>
+
+          <div class="form-step" id="step4" hidden>
+  <h3>STEP 4：CR PICK</h3>
+
+  <p>キャラを3体選択してください</p>
+
+  <div id="selectedPicks" class="selected-picks">
+  <div id="selectedPicksText">
+    まだキャラが選択されていません
+  </div>
+
+  <div class="pick-actions">
+    <button type="button" id="undoPick">1つ戻す</button>
+    <button type="button" id="completePicks" hidden>完了！</button>
+  </div>
+</div>
+
+  <div id="brawlerPicker" class="brawler-picker"></div>
+
+  <!-- 既存の保存機能との連携用 -->
+  <div hidden>
+    <select id="pick1"></select>
+    <select id="pick2"></select>
+    <select id="pick3"></select>
+  </div>
+
+  <button type="button" id="back4">戻る</button>
+  <button type="button" id="next4">次へ</button>
+</div>
+
+          <div class="form-step" id="step5" hidden>
+  <h3>STEP 5：試合結果</h3>
+  <label>試合結果</label>
+
+  <div class="result-buttons">
+    <button type="button" class="result-button win active" data-result="WIN">
+      WIN
+    </button>
+    <button type="button" class="result-button lose" data-result="LOSE">
+      LOSE
+    </button>
+  </div>
+
+  <select id="result" hidden>
+    <option value="WIN">WIN</option>
+    <option value="LOSE">LOSE</option>
   </select>
-<label>並び替え</label>
-<select id="sortBrawlers">
-  <option value="pickRate">使用率が高い順</option>
-  <option value="winRate">勝率が高い順</option>
-  <option value="count">使用回数が多い順</option>
-</select>
-  
-  <div id="brawlerStats"></div>
- <div id="brawlerRanking"></div> 
-</section></main>
+
+  <button type="button" id="back5">戻る</button>
+  <button type="button" id="saveMatch">SAVE MATCH</button>
+</div>
+        </section>
+
+      </div>
+
+
+      <!-- ANALYSIS PAGE -->
+      
+      <div class="page" id="analysisPage" hidden>
+<h1 class="page-title">PERFORMANCE ANALYSIS</h1>
+<p class="page-subtitle">モード・マップ・キャラ別分析</p>
+        <section class="mode-analysis">
+          <h2>MODE WIN RATE</h2>
+          <div class="stats" id="modeStats"></div>
+        </section>
+
+        <section class="map-analysis">
+          <h2>MAP WIN RATE</h2>
+          <div id="mapStats" class="stats"></div>
+        </section>
+
+        <section class="brawler-analysis">
+          <h2>MAP × BRAWLER ANALYSIS</h2>
+
+          <label>分析するマップ</label>
+          <select id="analysisMap">
+            <option value="">マップを選択</option>
+          </select>
+
+          <label>並び替え</label>
+          <select id="sortBrawlers">
+            <option value="pickRate">使用率が高い順</option>
+            <option value="winRate">勝率が高い順</option>
+            <option value="count">使用回数が多い順</option>
+          </select>
+
+          <div id="brawlerStats"></div>
+          <div id="brawlerRanking"></div>
+        </section>
+
+      </div>
+
+
+      <!-- HISTORY PAGE -->
+      
+      <div class="page" id="historyPage" hidden>
+<h1 class="page-title">MATCH HISTORY</h1>
+<p class="page-subtitle">過去の試合データを確認</p>
+        <section class="match-history">
+          <h2>MATCH HISTORY</h2>
+
+          <div class="history-filter">
+            <input
+              type="text"
+              id="historySearch"
+              placeholder="対戦相手・マップで検索"
+            >
+
+            <select id="historyResultFilter">
+              <option value="ALL">すべての試合</option>
+              <option value="WIN">WIN</option>
+              <option value="LOSE">LOSE</option>
+            </select>
+
+            <select id="historyDateSort">
+              <option value="newest">新しい順</option>
+              <option value="oldest">古い順</option>
+            </select>
+          </div>
+
+          <button type="button" id="undoDelete" disabled>復元</button>
+
+          <div id="matchList">
+            <p>まだ試合データがありません。</p>
+          </div>
+        </section>
+
+      </div>
+
+    </main>
 
     <footer>CR SCRIM ANALYZER / 2026</footer>
-    <section class="team-overview">
-  <h2>TEAM OVERVIEW</h2>
 
-  <div class="overview-grid">
-    <div class="overview-card">
-      <span>総試合数</span>
-      <strong id="overviewTotal">0</strong>
-    </div>
+    <!-- BOTTOM NAVIGATION -->
+    <nav class="bottom-nav">
+      <button type="button" class="nav-button active" data-page="homePage">
+        <span>⌂</span>
+        HOME
+      </button>
 
-    <div class="overview-card">
-      <span>勝率</span>
-      <strong id="overviewWinRate">--%</strong>
-    </div>
+      <button type="button" class="nav-button" data-page="matchPage">
+        <span>＋</span>
+        MATCH
+      </button>
 
-    <div class="overview-card">
-      <span>勝利数</span>
-      <strong id="overviewWins">0</strong>
-    </div>
+      <button type="button" class="nav-button" data-page="analysisPage">
+        <span>▥</span>
+        ANALYSIS
+      </button>
 
-    <div class="overview-card">
-      <span>敗北数</span>
-      <strong id="overviewLosses">0</strong>
-    </div>
-  </div>
-</section>
-    <section class="recent-performance">
-  <h2>RECENT PERFORMANCE</h2>
+      <button type="button" class="nav-button" data-page="historyPage">
+        <span>◷</span>
+        HISTORY
+      </button>
+    </nav>
 
-  <div class="recent-stats">
-    <div class="recent-card">
-      <span>LAST 5 WIN RATE</span>
-      <strong id="recentWinRate">--%</strong>
-    </div>
-
-    <div class="recent-card">
-      <span>CURRENT STREAK</span>
-      <strong id="currentStreak">--</strong>
-    </div>
   </div>
 
-  <div class="recent-card">
-    <span>LAST 5 MATCHES</span>
-    <div id="recentResults">データがありません</div>
-  </div>
-</section>
-    <section class="best-performance">
-  <h2>BEST PERFORMANCE</h2>
-
-  <div class="best-grid">
-    <div class="best-card">
-      <span>BEST WIN STREAK</span>
-      <strong id="bestWinStreak">0</strong>
-    </div>
-
-    <div class="best-card">
-      <span>WORST LOSE STREAK</span>
-      <strong id="worstLoseStreak">0</strong>
-    </div>
-
-    <div class="best-card">
-      <span>BEST MODE</span>
-      <strong id="bestMode">--</strong>
-    </div>
-  </div>
-</section>
-    <section class="opponent-analysis">
-  <h2>OPPONENT ANALYSIS</h2>
-  <div id="opponentStats">
-    データがありません
-  </div>
-</section>
-  </div>
-
-  <script src="script.js"></script>
+  <script type="module" src="script.js"></script>
 </body>
 </html>
