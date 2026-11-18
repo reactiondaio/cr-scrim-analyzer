@@ -1,4 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/13.4.0/firebase-app.js";
+
 import {
   getAuth,
   GoogleAuthProvider,
@@ -6,6 +7,7 @@ import {
   getRedirectResult,
   onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/13.4.0/firebase-auth.js";
+
 import {
   getFirestore,
   doc,
@@ -1007,7 +1009,7 @@ googleLoginButton.addEventListener("click", async () => {
     await signInWithRedirect(auth, googleProvider);
   } catch (error) {
     console.error("ログインエラー:", error);
-    alert("ログインに失敗しました。もう一度試してください。");
+    alert(error.code + "\n" + error.message);
   }
 });
 
