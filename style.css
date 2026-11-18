@@ -405,3 +405,380 @@ footer {
   background: #ff5c68;
   color: white;
 }
+/* ページ切り替え */
+.page {
+  display: none;
+  padding-bottom: 100px;
+}
+
+.page.active {
+  display: block;
+}
+
+/* 下部ナビゲーション */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  background: #151923;
+  border-top: 1px solid #343947;
+  padding: 10px 8px;
+  z-index: 1000;
+}
+
+.nav-button {
+  background: transparent;
+  border: none;
+  color: #858b99;
+  font-size: 10px;
+  font-weight: bold;
+  letter-spacing: 1px;
+  padding: 7px 0;
+  cursor: pointer;
+}
+
+.nav-button span {
+  display: block;
+  font-size: 22px;
+  margin-bottom: 4px;
+}
+
+.nav-button.active {
+  color: #facc15;
+}
+
+/* ページ内の見出し */
+.page section {
+  margin-top: 25px;
+}
+
+.page h2 {
+  margin-bottom: 15px;
+}
+
+/* 入力欄 */
+.page input,
+.page select {
+  max-width: 100%;
+}
+
+/* 下部メニュー分の余白 */
+body {
+  padding-bottom: 70px;
+}
+/* ページタイトル */
+.page-title {
+  margin-top: 35px;
+  color: #facc15;
+  font-size: clamp(25px, 5vw, 36px);
+  font-weight: 900;
+  letter-spacing: 2px;
+}
+
+.page-subtitle {
+  color: #858b99;
+  font-size: 12px;
+  letter-spacing: 1px;
+  margin-top: 8px;
+  margin-bottom: 25px;
+}
+/* セクション見出し */
+.page section > h2 {
+  color: #facc15;
+  font-size: 17px;
+  letter-spacing: 1.5px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #343947;
+}
+
+/* カードの演出 */
+.stat-card,
+.overview-card,
+.recent-card,
+.best-card,
+.opponent-card,
+.history-card {
+  transition: transform 0.2s, border-color 0.2s;
+}
+
+.stat-card:hover,
+.overview-card:hover,
+.recent-card:hover,
+.best-card:hover,
+.opponent-card:hover,
+.history-card:hover {
+  transform: translateY(-3px);
+  border-color: #facc15;
+}
+
+/* 試合登録フォーム */
+.match-form {
+  margin-top: 25px;
+  padding: 22px;
+  background: #151923;
+  border: 1px solid #343947;
+  border-radius: 16px;
+}
+
+.match-form label {
+  display: block;
+  color: #facc15;
+  font-size: 13px;
+  margin: 18px 0 9px;
+}
+
+.match-form input,
+.match-form select {
+  width: 100%;
+  padding: 13px;
+  background: #0b0d12;
+  color: white;
+  border: 1px solid #343947;
+  border-radius: 9px;
+  font-size: 15px;
+}
+
+.match-form input:focus,
+.match-form select:focus {
+  outline: none;
+  border-color: #facc15;
+}
+
+/* 登録画面のボタン */
+.match-form button {
+  padding: 12px 20px;
+  margin-top: 18px;
+  background: #facc15;
+  color: #11141c;
+  border: none;
+  border-radius: 9px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.match-form button:hover {
+  background: #ffe36b;
+}
+/* iPad・スマホ対応 */
+@media (max-width: 700px) {
+  .app {
+    padding: 16px;
+  }
+
+  header {
+    padding-bottom: 16px;
+  }
+
+  .welcome {
+    margin-top: 25px;
+  }
+
+  .stats,
+  .overview-grid,
+  .recent-stats,
+  .best-grid {
+    gap: 9px;
+  }
+
+  .stat-card h2 {
+    font-size: 28px;
+  }
+
+  .overview-card strong,
+  .recent-card strong,
+  .best-card strong {
+    font-size: 21px;
+  }
+
+  .history-filter {
+    flex-wrap: wrap;
+  }
+
+  .history-filter input,
+  .history-filter select {
+    width: 100%;
+  }
+
+  .bottom-nav {
+    padding-bottom: max(10px, env(safe-area-inset-bottom));
+  }
+}
+/* Bottom Navigation Upgrade */
+.bottom-nav {
+  height: 75px;
+  align-items: center;
+  padding: 8px 12px;
+  background: rgba(21, 25, 35, 0.97);
+  backdrop-filter: blur(12px);
+  border-top: 1px solid #343947;
+}
+
+.nav-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  border-radius: 12px;
+  transition: 0.2s;
+}
+
+.nav-button span {
+  font-size: 23px;
+  margin: 0;
+}
+
+.nav-button.active {
+  color: #facc15;
+  background: rgba(250, 204, 21, 0.10);
+}
+
+.nav-button:active {
+  transform: scale(0.95);
+}
+/* Brawler Picker */
+.brawler-picker {
+  margin-top: 20px;
+}
+
+.brawler-picker h4 {
+  color: #facc15;
+  font-size: 16px;
+  margin: 24px 0 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #343947;
+}
+
+.brawler-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.brawler-option {
+  min-width: 0;
+  padding: 4px;
+  background: transparent;
+  border: 2px solid transparent;
+  border-radius: 12px;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  transition: 0.2s;
+}
+
+.brawler-option img {
+  width: 100%;
+  max-width: 100px;
+  aspect-ratio: 1;
+  object-fit: contain;
+}
+
+.brawler-option span {
+  font-size: 10px;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+.brawler-option.selected {
+  border-color: #facc15;
+  background: rgba(250, 204, 21, 0.15);
+  box-shadow: 0 0 10px rgba(250, 204, 21, 0.25);
+}
+
+.selected-picks {
+  margin: 15px 0;
+  padding: 14px;
+  background: #151923;
+  border: 1px solid #facc15;
+  border-radius: 10px;
+  color: #facc15;
+  font-weight: bold;
+}
+
+@media (max-width: 500px) {
+  .brawler-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 7px;
+  }
+
+  .brawler-option {
+    padding: 6px 3px;
+  }
+}
+/* 選択中キャラをスクロール中も固定 */
+.selected-picks {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+/* 勝ち負けボタン */
+.result-buttons {
+  display: flex;
+  gap: 15px;
+  margin: 20px 0;
+}
+
+.result-button {
+  flex: 1;
+  aspect-ratio: 1 / 1;
+  max-width: 150px;
+  border: 2px solid #343947;
+  border-radius: 15px;
+  background: #151923;
+  color: white;
+  font-size: 24px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.result-button.win.active {
+  background: rgba(34, 197, 94, 0.2);
+  border-color: #22c55e;
+  color: #22c55e;
+}
+
+.result-button.lose.active {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: #ef4444;
+  color: #ef4444;
+}
+.result-button.win.active {
+  background: rgba(34, 197, 94, 0.2) !important;
+  border-color: #22c55e !important;
+  color: #22c55e !important;
+}
+
+.result-button.lose.active {
+  background: rgba(239, 68, 68, 0.2) !important;
+  border-color: #ef4444 !important;
+  color: #ef4444 !important;
+}
+.result-button,
+.result-button:hover,
+.result-button:focus,
+.result-button:active {
+  background-color: #151923 !important;
+  color: white !important;
+  border: 2px solid #343947 !important;
+}
+
+.result-button.win.active,
+.result-button.win.active:hover {
+  background-color: #166534 !important;
+  color: white !important;
+  border-color: #22c55e !important;
+}
+
+.result-button.lose.active,
+.result-button.lose.active:hover {
+  background-color: #991b1b !important;
+  color: white !important;
+  border-color: #ef4444 !important;
+}
